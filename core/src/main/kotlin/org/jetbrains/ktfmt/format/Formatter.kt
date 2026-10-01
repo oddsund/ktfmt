@@ -153,7 +153,12 @@ object Formatter {
     val code = file.text
     val kotlinInput = KotlinInput(code, file)
     val javaOutput =
-        JavaOutput(lineSeparator, kotlinInput, KDocCommentsHelper(lineSeparator, options.maxWidth))
+        JavaOutput(
+            lineSeparator,
+            kotlinInput,
+            KDocCommentsHelper(lineSeparator, options.maxWidth),
+            createIndentStringFunction(options),
+        )
     val builder = OpsBuilder(kotlinInput, javaOutput)
     file.accept(createAstVisitor(options, builder))
     builder.sync(kotlinInput.text.length)
@@ -242,4 +247,14 @@ object Formatter {
         if (needsTerminator) body + "\n" else body,
     )
   }
+
+  private fun createIndentStringFunction(options: FormattingOptions): (column: Int) -> String =
+      when (options.indentStyle) {
+        IndentStyle.SPACE -> { column ->
+          " ".repeat(column)
+        }
+        IndentStyle.TAB -> { column ->
+          "\t".repeat(column / options.blockIndent) + " ".repeat(column % options.blockIndent)
+        }
+      }
 }

@@ -47,6 +47,9 @@ data class FormattingOptions(
      */
     val continuationIndent: Int,
 
+    /** indentStyle sets the character used for indentation, either space or tab. */
+    val indentStyle: IndentStyle = IndentStyle.SPACE,
+
     /**
      * Strategy for managing trailing commas.
      *
@@ -152,6 +155,7 @@ data class FormattingOptions(
           .maxWidth(maxWidth)
           .blockIndent(blockIndent)
           .continuationIndent(continuationIndent)
+          .indentStyle(indentStyle)
           .trailingCommaManagementStrategy(trailingCommaManagementStrategy)
           .removeUnusedImports(removeUnusedImports)
           .preserveLambdaBreaks(preserveLambdaBreaks)
@@ -185,6 +189,7 @@ data class FormattingOptions(
     private var preserveLambdaBreaks: Boolean = true
     private var debuggingPrintOpsAfterFormatting: Boolean = false
     private var useExperimentalEngine: Boolean = false
+    private var indentStyle: IndentStyle = IndentStyle.SPACE
 
     /** @see FormattingOptions.maxWidth */
     fun maxWidth(maxWidth: Int): Builder = apply { this.maxWidth = maxWidth }
@@ -196,6 +201,9 @@ data class FormattingOptions(
     fun continuationIndent(continuationIndent: Int): Builder = apply {
       this.continuationIndent = continuationIndent
     }
+
+    /** @see FormattingOptions.indentStyle */
+    fun indentStyle(indentStyle: IndentStyle): Builder = apply { this.indentStyle = indentStyle }
 
     /** @see FormattingOptions.trailingCommaManagementStrategy */
     fun trailingCommaManagementStrategy(
@@ -228,6 +236,7 @@ data class FormattingOptions(
             maxWidth = maxWidth,
             blockIndent = blockIndent,
             continuationIndent = continuationIndent,
+            indentStyle = indentStyle,
             trailingCommaManagementStrategy = trailingCommaManagementStrategy,
             removeUnusedImports = removeUnusedImports,
             preserveLambdaBreaks = preserveLambdaBreaks,
@@ -235,6 +244,11 @@ data class FormattingOptions(
             experimentalEngine = useExperimentalEngine,
         )
   }
+}
+
+enum class IndentStyle(val style: String) {
+  SPACE("space"),
+  TAB("tab"),
 }
 
 enum class TrailingCommaManagementStrategy(

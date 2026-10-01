@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets
 import kotlin.io.path.createTempDirectory
 import kotlin.text.Charsets.UTF_8
 import org.jetbrains.ktfmt.format.Formatter
+import org.jetbrains.ktfmt.format.IndentStyle
 import org.jetbrains.ktfmt.format.TrailingCommaManagementStrategy
 import org.jetbrains.ktfmt.format.TrailingCommaManagementStrategy.ONLY_ADD
 import org.junit.jupiter.api.AfterEach
@@ -153,6 +154,23 @@ class EditorConfigResolverTest {
     val file = root.resolve("src/main/kotlin/Example.kt")
     val resolved = EditorConfigResolver.resolveFormattingOptions(file, Formatter.GOOGLE_FORMAT)
     assertEquals(Formatter.GOOGLE_FORMAT.copy(blockIndent = 8), resolved)
+  }
+
+  @Test
+  fun `overrides indentStyle based on editorconfig indent_style`() {
+    val conf = root.resolve(".editorconfig")
+    conf.writeText(
+        """
+        root = true
+        [*.kt]
+        indent_style = tab
+        """
+            .trimIndent(),
+    )
+
+    val file = root.resolve("src/main/kotlin/Example.kt")
+    val resolved = EditorConfigResolver.resolveFormattingOptions(file, Formatter.GOOGLE_FORMAT)
+    assertEquals(Formatter.GOOGLE_FORMAT.copy(indentStyle = IndentStyle.TAB), resolved)
   }
 
   @Test

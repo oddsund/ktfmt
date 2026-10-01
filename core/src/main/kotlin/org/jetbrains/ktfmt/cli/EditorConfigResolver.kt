@@ -28,6 +28,7 @@ import org.ec4j.core.model.EditorConfig
 import org.ec4j.core.model.PropertyType
 import org.ec4j.core.model.Version.CURRENT
 import org.jetbrains.ktfmt.format.FormattingOptions
+import org.jetbrains.ktfmt.format.IndentStyle
 import org.jetbrains.ktfmt.format.TrailingCommaManagementStrategy
 
 object EditorConfigResolver {
@@ -124,13 +125,29 @@ object EditorConfigResolver {
     val trailingCommaStrategy =
         getValue(commaManagementStrategy, baseOptions.trailingCommaManagementStrategy, false)
 
+    val indentStyle =
+        getValue(PropertyType.indent_style, baseOptions.indentStyle.toEc4j(), false).let {
+          if (it == PropertyType.IndentStyleValue.tab) {
+            IndentStyle.TAB
+          } else {
+            IndentStyle.SPACE
+          }
+        }
+
     val resolved =
         baseOptions.copy(
             maxWidth = maxWidth,
             blockIndent = blockIndent,
             continuationIndent = continuationIndent,
+            indentStyle = indentStyle,
             trailingCommaManagementStrategy = trailingCommaStrategy,
         )
     return resolved
   }
+
+  private fun IndentStyle.toEc4j() =
+      when (this) {
+        IndentStyle.SPACE -> PropertyType.IndentStyleValue.space
+        IndentStyle.TAB -> PropertyType.IndentStyleValue.tab
+      }
 }
